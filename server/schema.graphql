@@ -1,0 +1,10 @@
+type Meetup {
+    id: ID!
+    name: String
+    link: String
+    similar(first: Int=3, offset:Int=0): [Meetup]
+}
+
+type Query {
+  meetupsByName(name: String!, first: Int=3, offset: Int=0): [Meetup]
+}
