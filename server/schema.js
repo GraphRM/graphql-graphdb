@@ -15,6 +15,13 @@ const resolvers = {
       return session.run(query, args)
         .then( result => { return result.records.map(record => { return record.get("meetup").properties })})
     },
+    userByName : (root,args,context) => {
+      let session = context.driver.session();
+      let query = "MATCH (user:User) WHERE user.name = $name RETURN user"
+      return session.run(query, args)
+        .then( result => { 
+          return result.records.map(record => { return record.get("user").properties })[0]})
+    }
   },
   Meetup: {
     similar: (meetup, _, context) => {

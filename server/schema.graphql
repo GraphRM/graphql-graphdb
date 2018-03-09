@@ -1,10 +1,36 @@
 type Meetup {
-    id: ID!
-    name: String
-    link: String
-    similar(first: Int=3, offset:Int=0): [Meetup]
+  id: ID!
+  name: String
+  link: String
+  similar(first: Int = 3, offset: Int = 0): [Meetup]
+}
+
+type User {
+  id: ID!
+  name: String
+  status: String
+}
+
+type Tag {
+  id: ID!
+  name: String
+}
+
+type Event {
+  id: ID!
+  name: String
+  localDate: String
+  localTime: String
+  description: String
+}
+
+type Joined {
+  when: String
+  as: String
 }
 
 type Query {
-  meetupsByName(name: String!, first: Int=3, offset: Int=0): [Meetup]
+  meetupsByName(name: String!, first: Int = 3, offset: Int = 0): [Meetup]
+  userByName(name: String!): User
 }
+
