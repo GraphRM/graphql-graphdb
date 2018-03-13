@@ -1,32 +1,38 @@
 // graphql-tools combines a schema string with resolvers.
-import { makeExecutableSchema } from 'graphql-tools';
-import {v1 as neo4j} from 'neo4j-driver';
-import fs from 'fs';
+import { makeExecutableSchema } from "graphql-tools";
+import { v1 as neo4j } from "neo4j-driver";
+import fs from "fs";
 
 // Construct a schema, using GraphQL schema language
-const typeDefs = '' + fs.readFileSync('./schema.graphql', 'utf8');
+const typeDefs = "" + fs.readFileSync("./schema.graphql", "utf8");
 
 // Provide resolver functions for your schema fields
 const resolvers = {
   Query: {
     meetupsByName: (root, args, context) => {
       let session = context.driver.session();
-      let query = "MATCH (meetup:Meetup) WHERE meetup.name CONTAINS $name RETURN meetup LIMIT $first;"
-      return session.run(query, args)
-        .then( result => { return result.records.map(record => { return record.get("meetup").properties })})
+      let query =
+        "MATCH (meetup:Meetup) WHERE meetup.name CONTAINS $name RETURN meetup LIMIT $first;";
+      return session.run(query, args).then(result => {
+        return result.records.map(record => {
+          return record.get("meetup").properties;
+        });
+      });
     },
-    userByName : (root,args,context) => {
+    userByName: (root, args, context) => {
       let session = context.driver.session();
-      let query = "MATCH (user:User) WHERE user.name = $name RETURN user"
-      return session.run(query, args)
-        .then( result => { 
-          return result.records.map(record => { return record.get("user").properties })[0]})
+      let query = "MATCH (user:User) WHERE user.name = $name RETURN user";
+      return session.run(query, args).then(result => {
+        return result.records.map(record => {
+          return record.get("user").properties;
+        })[0];
+      });
     }
   },
   Meetup: {
     similar: (meetup, _, context) => {
       let session = context.driver.session();
-      let params = {id: meetup.id};
+      let params = { id: meetup.id };
       let query = `
 				MATCH (meetup:Meetup) WHERE meetup.id = $id
         MATCH (meetup:Meetup)-[:TAGGED]->(tag:Tag)<-[:TAGGED]-(newMeetup:Meetup)
@@ -35,18 +41,38 @@ const resolvers = {
         ORDER BY topicOverlap
         DESC LIMIT 3
 			`;
-      
-      return session.run(query, params)
-      	.then( result => {return result.records.map(record => {return record.get("newMeetup").properties})})
+
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return record.get("newMeetup").properties;
+        });
+      });
+    }
+  },
+  User: {
+    joined: (user, _, context) => {
+      let session = context.driver.session();
+      let params = { name: user.name };
+      let query = `
+      MATCH (u:User {name : $name})-[j:JOINED]->(m:Meetup)
+      RETURN j,m
+      `;
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return {
+            ...record.get("j").properties,
+            meetup: record.get("m").properties
+          };
+        });
+      });
     }
   }
-  
 };
 
 // Required: Export the GraphQL.js schema object as "schema"
 export const schema = makeExecutableSchema({
   typeDefs,
-  resolvers,
+  resolvers
 });
 
 // Optional: Export a function to get context from the request. It accepts two
@@ -56,9 +82,15 @@ let driver;
 
 export function context(headers, secrets) {
   if (!driver) {
-    driver = neo4j.driver(secrets.NEO4J_URI || "bolt://localhost:7687", neo4j.auth.basic(secrets.NEO4J_USER || "neo4j", secrets.NEO4J_PASSWORD || "graphrm"))
+    driver = neo4j.driver(
+      secrets.NEO4J_URI || "bolt://localhost:7687",
+      neo4j.auth.basic(
+        secrets.NEO4J_USER || "neo4j",
+        secrets.NEO4J_PASSWORD || "graphrm"
+      )
+    );
   }
   return {
     driver
-  }
-};
+  };
+}
