@@ -35,76 +35,35 @@ const resolvers = {
   },
   Meetup: {
     tags: (meetup, _, context) => {
-      const params = { name: meetup.name };
-      const query = `
-        MATCH (m:Meetup {name : $name})-[:TAGGED]->(t:Tag)
-        RETURN t
-        `;
-      return executeQueryAll(query, "t", params, context);
+      return context.loaders.tagsByMeetup.load(meetup.name);
     },
 
     members: (meetup, _, context) => {
-      const params = { name: meetup.name };
-      const query = `
-        MATCH (m:Meetup {name : $name})<-[:JOINED]-(u:User)
-        RETURN u
-        `;
-      return executeQueryAll(query, "u", params, context);
+      return context.loaders.membersByMeetup.load(meetup.name);
     },
     events: (meetup, _, context) => {
-      const params = { name: meetup.name };
-      const query = `
-        MATCH (m:Meetup {name : $name})-[:HAS_EVENT]->(e:Event)
-        RETURN e
-        `;
-      return executeQueryAll(query, "e", params, context);
+      return context.loaders.eventsByMeetup.load(meetup.name);
     }
   },
   User: {
     meetups: (user, _, context) => {
-      const params = { name: user.name };
-      const query = `
-      MATCH (u:User {name : $name})-[:JOINED]->(m:Meetup)
-      RETURN m
-      `;
-      return executeQueryAll(query, "m", params, context);
+      return context.loaders.meetupsByUser.load(user.name);
     },
     events: (user, _, context) => {
-      const params = { name: user.name };
-      const query = `
-      MATCH (u:User {name : $name})-[:PARTICIPATED]->(e:Event)
-      RETURN e
-      `;
-      return executeQueryAll(query, "e", params, context);
+      return context.loaders.eventsByUser.load(user.name);
     }
   },
   Tag: {
     meetups: (tag, _, context) => {
-      const params = { id: tag.id };
-      const query = `
-      MATCH (t:Tag {id : $id})<-[:TAGGED]-(m:Meetup)
-      RETURN m
-      `;
-      return executeQueryAll(query, "m", params, context);
+      return context.loaders.meetupsByTag.load(tag.id);
     }
   },
   Event: {
     partecipants: (event, _, context) => {
-      const params = { id: event.id };
-      const query = `
-      MATCH (e:Event {id : $id})<-[:PARTICIPATED]-(u:User)
-      RETURN u
-      `;
-      return executeQueryAll(query, "u", params, context);
+      return context.loaders.partecipantsByEvent.load(event.id);
     },
     meetup: (event, _, context) => {
-      let session = context.driver.session();
-      let params = { id: event.id };
-      let query = `
-      MATCH (e:Event {id : $id})<-[:HAS_EVENT]-(m:Meetup)
-      RETURN m
-      `;
-      return executeQueryOne(query, "m", params, context);
+      return context.loaders.meetupByEvent.load(event.id);
     }
   }
 };
