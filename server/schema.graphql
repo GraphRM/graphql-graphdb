@@ -2,7 +2,8 @@ type Meetup {
   id: ID!
   name: String
   link: String
-  similar(first: Int = 3, offset: Int = 0): [Meetup]
+  members: [User]!
+  events: [Event]!
   tags: [Tag]!
 }
 
@@ -10,12 +11,14 @@ type User {
   id: ID!
   name: String
   status: String
-  joined: [Joined]!
+  meetups: [Meetup]!
+  events: [Event]!
 }
 
 type Tag {
   id: ID!
   name: String
+  meetups: [Meetup]!
 }
 
 type Event {
@@ -24,16 +27,11 @@ type Event {
   localDate: String
   localTime: String
   description: String
-  participants: [User]!
-}
-
-type Joined {
-  when: String
-  as: String
+  partecipants: [User]!
   meetup: Meetup!
 }
 
 type Query {
   meetupsByName(name: String!, first: Int = 3, offset: Int = 0): [Meetup]
-  userByName(name: String!): User
+  membersByName(name: String!, first: Int = 3, offset: Int = 0): [User]
 }

@@ -30,24 +30,7 @@ const resolvers = {
     }
   },
   Meetup: {
-    similar: (meetup, _, context) => {
-      let session = context.driver.session();
-      let params = { id: meetup.id };
-      let query = `
-				MATCH (meetup:Meetup) WHERE meetup.id = $id
-        MATCH (meetup:Meetup)-[:TAGGED]->(tag:Tag)<-[:TAGGED]-(newMeetup:Meetup)
-        WITH meetup, newMeetup, COUNT(*) AS topicOverlap
-        RETURN newMeetup
-        ORDER BY topicOverlap
-        DESC LIMIT 3
-			`;
 
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("newMeetup").properties;
-        });
-      });
-    }
   },
   User: {
     joined: (user, _, context) => {

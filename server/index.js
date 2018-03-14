@@ -21,9 +21,6 @@ server.use('/graphiql', graphiqlExpress({
     id
     name
     link
-    similar {
-      name
-    }
   }
 }
 `,
