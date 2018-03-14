@@ -120,7 +120,7 @@ export const schema = makeExecutableSchema({
 // in secrets section). It must return an object (or a promise resolving to it).
 let driver;
 
-export function context(headers, secrets) {
+export function context(headers, secrets, loaders) {
   if (!driver) {
     driver = neo4j.driver(
       secrets.NEO4J_URI || "bolt://localhost:7687",
@@ -131,6 +131,7 @@ export function context(headers, secrets) {
     );
   }
   return {
-    driver
+    driver,
+    loaders: loaders(driver)
   };
 }
