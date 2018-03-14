@@ -6,127 +6,92 @@ import fs from "fs";
 // Construct a schema, using GraphQL schema language
 const typeDefs = "" + fs.readFileSync("./schema.graphql", "utf8");
 
+const executeQuery = (query, name, args, context) => {
+  console.log(query);
+  let session = context.driver.session();
+  return session.run(query, args).then(result => {
+    return result.records.map(record => {
+      return record.get(name).properties;
+    });
+  }); 
+}
+
 // Provide resolver functions for your schema fields
 const resolvers = {
   Query: {
     meetupsByName: (root, args, context) => {
-      let session = context.driver.session();
-      let query =
+      const query =
         "MATCH (meetup:Meetup) WHERE meetup.name CONTAINS $name RETURN meetup LIMIT $first;";
-      return session.run(query, args).then(result => {
-        return result.records.map(record => {
-          return record.get("meetup").properties;
-        });
-      });
+      return executeQuery(query, "meetup", args, context);
     },
     membersByName: (root, args, context) => {
-      let session = context.driver.session();
-      let query = "MATCH (user:User) WHERE user.name = $name RETURN user";
-      return session.run(query, args).then(result => {
-        return result.records.map(record => {
-          return record.get("user").properties;
-        });
-      });
+      const query = "MATCH (user:User) WHERE user.name = $name RETURN user";
+      return executeQuery(query, "user", args, context);
     }
   },
   Meetup: {
     tags: (meetup, _, context) => {
-      let session = context.driver.session();
-      let params = { name: meetup.name };
-      let query = `
+      const params = { name: meetup.name };
+      const query = `
         MATCH (m:Meetup {name : $name})-[:TAGGED]->(t:Tag)
         RETURN t
         `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("t").properties;
-        });
-      });
+      return executeQuery(query, "t", params, context);
     },
 
     members: (meetup, _, context) => {
-      let session = context.driver.session();
-      let params = { name: meetup.name };
-      let query = `
+      const params = { name: meetup.name };
+      const query = `
         MATCH (m:Meetup {name : $name})<-[:JOINED]-(u:User)
         RETURN u
         `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("u").properties;
-        });
-      });
+      return executeQuery(query, "u", params, context);
     },
     events: (meetup, _, context) => {
-      let session = context.driver.session();
-      let params = { name: meetup.name };
-      let query = `
+      const params = { name: meetup.name };
+      const query = `
         MATCH (m:Meetup {name : $name})-[:HAS_EVENT]->(e:Event)
         RETURN e
         `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("e").properties;
-        });
-      });
+      return executeQuery(query, "u", params, context);
     }
   },
   User: {
     meetups: (user, _, context) => {
-      let session = context.driver.session();
-      let params = { name: user.name };
-      let query = `
+      const params = { name: user.name };
+      const query = `
       MATCH (u:User {name : $name})-[:JOINED]->(m:Meetup)
       RETURN m
       `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("m").properties;
-        });
-      });
+      return executeQuery(query, "m", params, context);
     },
     events: (user, _, context) => {
-      let session = context.driver.session();
-      let params = { name: user.name };
-      let query = `
+      const params = { name: user.name };
+      const query = `
       MATCH (u:User {name : $name})-[:PARTICIPATED]->(e:Event)
       RETURN e
       `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("e").properties;
-        });
-      });
+      return executeQuery(query, "e", params, context);
     }
   },
   Tag: {
     meetups: (tag, _, context) => {
-      let session = context.driver.session();
-      let params = { id: tag.id };
-      let query = `
+      const params = { id: tag.id };
+      const query = `
       MATCH (t:Tag {id : $id})<-[:TAGGED]-(m:Meetup)
       RETURN m
       `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("m").properties;
-        });
-      });
+      return executeQuery(query, "m", params, context);
     }
   },
   Event: {
     partecipants: (event, _, context) => {
-      let session = context.driver.session();
-      let params = { id: event.id };
-      let query = `
+      const params = { id: event.id };
+      const query = `
       MATCH (e:Event {id : $id})<-[:PARTICIPATED]-(u:User)
       RETURN u
       `;
-      return session.run(query, params).then(result => {
-        return result.records.map(record => {
-          return record.get("u").properties;
-        });
-      });
+      return executeQuery(query, "u", params, context);
     },
     meetup: (event, _, context) => {
       let session = context.driver.session();
@@ -135,6 +100,7 @@ const resolvers = {
       MATCH (e:Event {id : $id})<-[:HAS_EVENT]-(m:Meetup)
       RETURN m
       `;
+      console.log(query);
       return session.run(query, params).then(result => {
         return result.records.map(record => {
           return record.get("m").properties;
