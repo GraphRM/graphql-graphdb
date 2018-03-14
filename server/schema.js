@@ -76,12 +76,25 @@ const resolvers = {
       let session = context.driver.session();
       let params = { name: user.name };
       let query = `
-      MATCH (u:User {name : $name})-[j:JOINED]->(m:Meetup)
+      MATCH (u:User {name : $name})-[:JOINED]->(m:Meetup)
       RETURN m
       `;
       return session.run(query, params).then(result => {
         return result.records.map(record => {
           return record.get("m").properties;
+        });
+      });
+    },
+    events: (user, _, context) => {
+      let session = context.driver.session();
+      let params = { name: user.name };
+      let query = `
+      MATCH (u:User {name : $name})-[:PARTICIPATED]->(e:Event)
+      RETURN e
+      `;
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return record.get("e").properties;
         });
       });
     }
