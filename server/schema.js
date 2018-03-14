@@ -19,7 +19,7 @@ const resolvers = {
         });
       });
     },
-    userByName: (root, args, context) => {
+    membersByName: (root, args, context) => {
       let session = context.driver.session();
       let query = "MATCH (user:User) WHERE user.name = $name RETURN user";
       return session.run(query, args).then(result => {
@@ -30,25 +30,37 @@ const resolvers = {
     }
   },
   Meetup: {
-
-  },
-  User: {
-    joined: (user, _, context) => {
+    tags: (meetup, _, context) => {
       let session = context.driver.session();
-      let params = { name: user.name };
+      let params = { name: meetup.name };
       let query = `
-      MATCH (u:User {name : $name})-[j:JOINED]->(m:Meetup)
-      RETURN j,m
-      `;
+        MATCH (m:Meetup {name : $name})-[:TAGGED]->(t:Tag)
+        RETURN t
+        `;
       return session.run(query, params).then(result => {
         return result.records.map(record => {
-          return {
-            ...record.get("j").properties,
-            meetup: record.get("m").properties
-          };
+          return record.get("t").properties;
         });
       });
     }
+  },
+  User: {
+    // joined: (user, _, context) => {
+    //   let session = context.driver.session();
+    //   let params = { name: user.name };
+    //   let query = `
+    //   MATCH (u:User {name : $name})-[j:JOINED]->(m:Meetup)
+    //   RETURN j,m
+    //   `;
+    //   return session.run(query, params).then(result => {
+    //     return result.records.map(record => {
+    //       return {
+    //         ...record.get("j").properties,
+    //         meetup: record.get("m").properties
+    //       };
+    //     });
+    //   });
+    // }
   }
 };
 
