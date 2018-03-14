@@ -1,6 +1,7 @@
 // graphql-tools combines a schema string with resolvers.
 import { makeExecutableSchema } from "graphql-tools";
 import { v1 as neo4j } from "neo4j-driver";
+import {neo4jgraphql} from 'neo4j-graphql-js';
 import fs from "fs";
 
 // Construct a schema, using GraphQL schema language
@@ -23,49 +24,9 @@ const executeQueryOne = (query, name, args, context) => {
 // Provide resolver functions for your schema fields
 const resolvers = {
   Query: {
-    meetupsByName: (root, args, context) => {
-      const query =
-        "MATCH (meetup:Meetup) WHERE meetup.name CONTAINS $name RETURN meetup LIMIT $first;";
-      return executeQueryAll(query, "meetup", args, context);
-    },
-    membersByName: (root, args, context) => {
-      const query = "MATCH (user:User) WHERE user.name = $name RETURN user";
-      return executeQueryAll(query, "user", args, context);
-    }
+    meetupsByName: (object, params, ctx, resolveInfo) => neo4jgraphql(object, params, ctx, resolveInfo),
+    membersByName: (object, params, ctx, resolveInfo) => neo4jgraphql(object, params, ctx, resolveInfo)
   },
-  Meetup: {
-    tags: (meetup, _, context) => {
-      return context.loaders.tagsByMeetup.load(meetup.name);
-    },
-
-    members: (meetup, _, context) => {
-      return context.loaders.membersByMeetup.load(meetup.name);
-    },
-    events: (meetup, _, context) => {
-      return context.loaders.eventsByMeetup.load(meetup.name);
-    }
-  },
-  User: {
-    meetups: (user, _, context) => {
-      return context.loaders.meetupsByUser.load(user.name);
-    },
-    events: (user, _, context) => {
-      return context.loaders.eventsByUser.load(user.name);
-    }
-  },
-  Tag: {
-    meetups: (tag, _, context) => {
-      return context.loaders.meetupsByTag.load(tag.id);
-    }
-  },
-  Event: {
-    partecipants: (event, _, context) => {
-      return context.loaders.partecipantsByEvent.load(event.id);
-    },
-    meetup: (event, _, context) => {
-      return context.loaders.meetupByEvent.load(event.id);
-    }
-  }
 };
 
 // Required: Export the GraphQL.js schema object as "schema"
@@ -91,6 +52,6 @@ export function context(headers, secrets, loaders) {
   }
   return {
     driver,
-    loaders: loaders(driver)
+    headers
   };
 }

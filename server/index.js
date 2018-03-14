@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import loaders from './loaders'
 
 import { schema, rootValue, context } from './schema';
+debugger;
 
 const PORT = 3000;
 const server = express();
@@ -18,13 +19,19 @@ server.use('/graphql', bodyParser.json(), graphqlExpress(request => ({
 server.use('/graphiql', graphiqlExpress({
   endpointURL: '/graphql',
   query: `# Welcome to GraphiQL
-{
-  meetupsByName(name:"GraphRM") {
-    id
-    name
-    link
+  {
+    meetupsByName(name:"GraphRM") {
+      id
+      name
+      link
+      members {
+        name
+        events {
+          name
+        }
+      }
+    }
   }
-}
 `,
 }));
 

@@ -2,23 +2,23 @@ type Meetup {
   id: ID!
   name: String
   link: String
-  members: [User]!
-  events: [Event]!
-  tags: [Tag]!
+  members: [User]! @relation(name: "JOINED", direction:"IN")
+  events: [Event]! @relation(name: "HAS_EVENT", direction:"OUT")
+  tags: [Tag]! @relation(name: "TAGGED", direction:"OUT")
 }
 
 type User {
   id: ID!
   name: String
   status: String
-  meetups: [Meetup]!
-  events: [Event]!
+  meetups: [Meetup]! @relation(name: "JOINED", direction:"OUT")
+  events: [Event]! @relation(name: "PARTICIPATED", direction:"OUT")
 }
 
 type Tag {
   id: ID!
-  name: String
-  meetups: [Meetup]!
+  name: String,
+  meetups: [Meetup]! @relation(name: "TAGGED", direction:"IN")
 }
 
 type Event {
@@ -27,11 +27,11 @@ type Event {
   localDate: String
   localTime: String
   description: String
-  partecipants: [User]!
-  meetup: Meetup!
+  members: [User]! @relation(name: "PARTICIPATED", direction:"IN")
+  meetup: Meetup! @relation(name: "HAS_EVENT", direction:"IN")
 }
 
 type Query {
   meetupsByName(name: String!, first: Int = 3, offset: Int = 0): [Meetup]
-  membersByName(name: String!, first: Int = 3, offset: Int = 0): [User]
+  membersByName(name: String!): [User]
 }
