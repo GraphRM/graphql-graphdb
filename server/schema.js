@@ -42,6 +42,19 @@ const resolvers = {
           return record.get("t").properties;
         });
       });
+    },
+    events: (meetup, _, context) => {
+      let session = context.driver.session();
+      let params = { name: meetup.name };
+      let query = `
+        MATCH (m:Meetup {name : $name})-[:HAS_EVENT]->(e:Event)
+        RETURN e
+        `;
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return record.get("e").properties;
+        });
+      });
     }
   },
   User: {
