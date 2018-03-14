@@ -27,7 +27,7 @@ type Event {
   localDate: String
   localTime: String
   description: String
-  members: [User]! @relation(name: "PARTICIPATED", direction:"IN")
+  partecipants: [User]! @relation(name: "PARTICIPATED", direction:"IN")
   meetup: Meetup! @relation(name: "HAS_EVENT", direction:"IN")
 }
 
