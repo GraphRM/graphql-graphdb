@@ -108,6 +108,7 @@ export default driver => {
     ));
 
     return {
+        tagsByMeetup,
         membersByMeetup,
         eventsByMeetup,
         meetupsByUser,
