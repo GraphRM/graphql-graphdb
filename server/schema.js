@@ -98,6 +98,21 @@ const resolvers = {
         });
       });
     }
+  },
+  Tag: {
+    meetups: (tag, _, context) => {
+      let session = context.driver.session();
+      let params = { id: tag.id };
+      let query = `
+      MATCH (t:Tag {id : $id})<-[:TAGGED]-(m:Meetup)
+      RETURN m
+      `;
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return record.get("m").properties;
+        });
+      });
+    }
   }
 };
 
