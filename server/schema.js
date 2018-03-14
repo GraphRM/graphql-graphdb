@@ -113,6 +113,21 @@ const resolvers = {
         });
       });
     }
+  },
+  Event: {
+    partecipants: (event, _, context) => {
+      let session = context.driver.session();
+      let params = { id: event.id };
+      let query = `
+      MATCH (e:Event {id : $id})<-[:PARTICIPATED]-(u:User)
+      RETURN u
+      `;
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return record.get("u").properties;
+        });
+      });
+    }
   }
 };
 
