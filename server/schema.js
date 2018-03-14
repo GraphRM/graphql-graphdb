@@ -25,7 +25,7 @@ const resolvers = {
       return session.run(query, args).then(result => {
         return result.records.map(record => {
           return record.get("user").properties;
-        })[0];
+        });
       });
     }
   },
@@ -72,22 +72,19 @@ const resolvers = {
     }
   },
   User: {
-    // joined: (user, _, context) => {
-    //   let session = context.driver.session();
-    //   let params = { name: user.name };
-    //   let query = `
-    //   MATCH (u:User {name : $name})-[j:JOINED]->(m:Meetup)
-    //   RETURN j,m
-    //   `;
-    //   return session.run(query, params).then(result => {
-    //     return result.records.map(record => {
-    //       return {
-    //         ...record.get("j").properties,
-    //         meetup: record.get("m").properties
-    //       };
-    //     });
-    //   });
-    // }
+    meetups: (user, _, context) => {
+      let session = context.driver.session();
+      let params = { name: user.name };
+      let query = `
+      MATCH (u:User {name : $name})-[j:JOINED]->(m:Meetup)
+      RETURN m
+      `;
+      return session.run(query, params).then(result => {
+        return result.records.map(record => {
+          return record.get("m").properties;
+        });
+      });
+    }
   }
 };
 
