@@ -33,7 +33,7 @@ $ npm start
 
 ### Branch `master`
 
-Sul branch `master` (il precedente) viene mostrata una integrazione basilare tra GraphQL e Neo4J: una volta avviato il progetto, procedere su GraphiQL ed eseguire la seguente query:
+Sul branch `master` viene mostrata una integrazione basilare tra GraphQL e Neo4J: una volta avviato il progetto, procedere su GraphiQL ed eseguire la seguente query:
 
 ```graphql
 {
@@ -61,7 +61,7 @@ $ npm start
 
 ### Branch `dataloader`
 
-Sul branch `datalaoder` (il corrente) si parte da `master` e si aggiunge il file `loader.js`: questo file contiene la logica per i nostri loader, ovvero un meccanismo di caching che permette al server di evitare query duplicate, riducendo sensibilmente il tempo di esecuzione di ciascuna query GraphQL.
+Sul branch `datalaoder` (il precedente) si parte da `master` e si aggiunge il file `loader.js`: questo file contiene la logica per i nostri loader, ovvero un meccanismo di caching che permette al server di evitare query duplicate, riducendo sensibilmente il tempo di esecuzione di ciascuna query GraphQL.
 
 Per verificarne l'efficacia provate a riavviare il server ed eseguire nuovamente la seguente query:
 
@@ -90,4 +90,28 @@ $ git checkout single-query
 $ npm start
 ```
 
-Cliccate [qui](https://github.com/GraphRM/graphql-graphdb/tree/single-query) per continuare a leggere...
+### Branch `single-query`
+
+Sul branch `single-query` (il corrente) si parte nuovamente da `master` cambiando approccio rispetto a `dataloader`: questa volta adotteremo un adapter vendor-specific che partendo dall'AST della query GraphQL, dallo schema GraphQL tradurrà da GraphQL ad una query specifica per il database.
+
+Notare che il file `schema.graphql` in questo caso è cambiato, in particolare notare la nuova notazione `@relation`: si tratta di una estensione di GraphQL specifica per Neo4J con cui l'adapter viene "aiutato" a capire che quel determinato attributo necessita la navigazione di una relazione (arco/edge) per poter raccogliere i dati di interesse.
+
+Per verificarne l'efficacia provate a riavviare il server ed eseguire nuovamente la seguente query:
+
+```graphql
+{
+  meetupsByName(name:"GraphRM") {
+    id
+    name
+    link
+    members {
+        name
+    }
+  }
+}
+```
+
+Nel terminale vedrete che il numero di query questa volta è pari a 1. Niente più query multiple: abbiamo raggiunto il mapping 1:1 tra GraphQL ed un GraphDB.
+
+Questo approccio è ancora in fase di sviluppo, come spiegato nella presentazione, non ancora pronto per il rilascio in produzione.
+Nonostante il suo stato ancora iniziale, con un supporto parziale di GraphQL (mancanza del support per `Enum`, etc...), per casi molto semplici di pura navigazione del grafo l'approccio con la notazione `@relation` è molto pratico e conveniente da usare.
