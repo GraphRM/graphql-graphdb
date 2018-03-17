@@ -4,7 +4,7 @@ Questo repository contiene un esempio di come integrare GraphQL con una graph da
 
 Il codice qui presente è il complemento del talk seguente (date un'occhiata per una introduzione anche a GraphQL):
 
-* [`GraphQL ❤️ GraphDB`]()
+* [`GraphQL ❤️ GraphDB`](https://www.slideshare.net/GraphRM/graphql-graphdb)
 
 Ci sono 3 branch principali in questo repository che, in modo progressivo, mostrano come migliorare l'integrazione tra i due strumenti.
 
@@ -40,4 +40,4 @@ $ git checkout dataloader
 $ npm start
 ```
 
-Cliccate [qui]() per continuare a leggere...
+Cliccate [qui](https://github.com/GraphRM/graphql-graphdb/tree/dataloader) per continuare a leggere...
