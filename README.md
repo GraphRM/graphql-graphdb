@@ -2,6 +2,8 @@
 
 Questo repository contiene un esempio di come integrare GraphQL con una graph database (in questo caso Neo4J).
 
+Come database di riferimento per questo talk abbiamo usato quello presente [in questo repository](https://github.com/GraphRM/workshop-neo4j-docker): avviate il database prima di iniziare con questo tutorial. 
+
 Il codice qui presente è il complemento del talk seguente (date un'occhiata per una introduzione anche a GraphQL):
 
 * [`GraphQL ❤️ GraphDB`](https://www.slideshare.net/GraphRM/graphql-graphdb)
@@ -11,6 +13,23 @@ Ci sono 3 branch principali in questo repository che, in modo progressivo, mostr
 * `master` contiene una prima implementazione naïve di GraphQL (basata unicamente sugli `Hello world` online)
 * `dataloader` contiene una versione migliorata di `master` in cui viene adottato uno strumento per fare caching e migliorare le prestazioni del web server GraphQL.
 * `single-query` contiene l'apice del miglioramento, in cui per una singola query GraphQL corrisponde una sola query del GraphDB.
+
+### Setup
+
+Il seguente repository contiene un web server generato in NodeJS: questo è un pre-requisito per iniziare il setup.
+
+Per iniziare con il progetto potete entrare nella cartella `server` ed installare i pacchetti richiesti:
+
+```sh
+$ cd server
+$ npm install
+```
+
+Una volta installato il necessario possiamo avviare il server:
+
+```sh
+$ npm start
+```
 
 ### Branch `master`
 
