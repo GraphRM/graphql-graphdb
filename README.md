@@ -35,7 +35,7 @@ $ npm start
 
 ### Branch `master`
 
-Sul branch master (il corrente) viene mostrata una integrazione basilare tra GraphQL e Neo4J: una volta avviato il progetto, procedere su GraphiQL ed eseguire la seguente query:
+Sul branch `master` (il precedente) viene mostrata una integrazione basilare tra GraphQL e Neo4J: una volta avviato il progetto, procedere su GraphiQL ed eseguire la seguente query:
 
 ```graphql
 {
@@ -61,4 +61,35 @@ $ git checkout dataloader
 $ npm start
 ```
 
-Cliccate [qui](https://github.com/GraphRM/graphql-graphdb/tree/dataloader#branch-dataloader) per continuare a leggere...
+### Branch `dataloader`
+
+Sul branch `datalaoder` (il corrente) si parte da `master` e si aggiunge il file `loader.js`: questo file contiene la logica per i nostri loader, ovvero un meccanismo di caching che permette al server di evitare query duplicate, riducendo sensibilmente il tempo di esecuzione di ciascuna query GraphQL.
+
+Per verificarne l'efficacia provate a riavviare il server ed eseguire nuovamente la seguente query:
+
+```graphql
+{
+  meetupsByName(name:"GraphRM") {
+    id
+    name
+    link
+    members {
+        name
+    }
+  }
+}
+```
+
+Nel terminale vedrete che il numero di query eseguite è leggermente inferiore rispetto a prima, ed anche il tempo di risposta del server è migliorata sensibilmente.
+
+Questo approccio con caching funziona molto bene e permette di ridurre sensibilmente l'impatto di ciascuna query sul server. Come tutte le situazioni di query, c'è da considerare il caso di cache invalidation (non presente in questo talk) in cui per ciascuna GraphQL mutation (modifica dei dati all'interno della base di dati) il relativo `id` deve essere rimosso dalla cache `dataloader`.
+
+Per vedere migliorare ulteriormente le prestazioni del nostro web server andare sul branch `single-query`:
+
+```sh
+// spengere il server
+$ git checkout single-query
+$ npm start
+```
+
+Cliccate [qui](https://github.com/GraphRM/graphql-graphdb/tree/single-query) per continuare a leggere...
