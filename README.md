@@ -1,8 +1,10 @@
 ### GraphQL ❤️ GraphDB
 
+[![GraphRM chat](http://codegardenroma.herokuapp.com/badge.svg)](http://codegardenroma.herokuapp.com/)
+
 Questo repository contiene un esempio di come integrare GraphQL con una graph database (in questo caso Neo4J).
 
-Come database di riferimento per questo talk abbiamo usato quello presente [in questo repository](https://github.com/GraphRM/workshop-neo4j-docker): avviate il database prima di iniziare con questo tutorial. 
+Come database di riferimento per questo talk abbiamo usato quello presente [in questo repository](https://github.com/GraphRM/workshop-neo4j-docker): avviate il database prima di iniziare con questo tutorial.
 
 Il codice qui presente è il complemento del talk seguente (date un'occhiata per una introduzione anche a GraphQL):
 
